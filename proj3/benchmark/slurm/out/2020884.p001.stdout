@@ -1,0 +1,360 @@
+Building project...
+Generating test datasets...
+Generated 10000 data points with 10 features
+Anomalies: 500 (5.00%)
+Output: ../datasets/small_gaussian.csv
+Generated 50000 data points with 10 features
+Anomalies: 2500 (5.00%)
+Output: ../datasets/medium_gaussian.csv
+Generated 100000 data points with 10 features
+Anomalies: 5000 (5.00%)
+Output: ../datasets/large_gaussian.csv
+==============================================
+Project 3: Isolation Forest Benchmark
+==============================================
+
+Running sequential benchmarks...
+Sequential small run 1: 158.394431s
+Sequential small run 2: 171.779056s
+Sequential small run 3: 168.120743s
+Sequential small run 4: 175.477621s
+Sequential small run 5: 160.808384s
+Sequential medium run 1: 733.734461s
+Sequential medium run 2: 744.218028s
+Sequential medium run 3: 733.89984s
+Sequential medium run 4: 735.37135s
+Sequential medium run 5: 755.673587s
+Sequential large run 1: 1.449775786s
+Sequential large run 2: 1.449565018s
+Sequential large run 3: 1.447427773s
+Sequential large run 4: 1.456290501s
+Sequential large run 5: 1.461756423s
+
+Running parallel (channel-based) benchmarks...
+Parallel small threads=2 run 1: 124.005402s
+Parallel small threads=2 run 2: 120.890044s
+Parallel small threads=2 run 3: 95.219814s
+Parallel small threads=2 run 4: 95.723729s
+Parallel small threads=2 run 5: 101.109792s
+Parallel small threads=4 run 1: 77.1555s
+Parallel small threads=4 run 2: 76.177127s
+Parallel small threads=4 run 3: 71.621578s
+Parallel small threads=4 run 4: 63.775514s
+Parallel small threads=4 run 5: 65.553661s
+Parallel small threads=6 run 1: 68.358291s
+Parallel small threads=6 run 2: 66.259536s
+Parallel small threads=6 run 3: 66.629264s
+Parallel small threads=6 run 4: 56.658444s
+Parallel small threads=6 run 5: 59.94642s
+Parallel small threads=8 run 1: 47.405158s
+Parallel small threads=8 run 2: 54.887426s
+Parallel small threads=8 run 3: 57.924804s
+Parallel small threads=8 run 4: 54.562978s
+Parallel small threads=8 run 5: 64.857306s
+Parallel small threads=12 run 1: 45.023225s
+Parallel small threads=12 run 2: 46.417785s
+Parallel small threads=12 run 3: 44.215961s
+Parallel small threads=12 run 4: 41.656768s
+Parallel small threads=12 run 5: 47.978474s
+Parallel medium threads=2 run 1: 415.160163s
+Parallel medium threads=2 run 2: 401.812327s
+Parallel medium threads=2 run 3: 411.580968s
+Parallel medium threads=2 run 4: 419.409873s
+Parallel medium threads=2 run 5: 417.508526s
+Parallel medium threads=4 run 1: 219.064606s
+Parallel medium threads=4 run 2: 238.559179s
+Parallel medium threads=4 run 3: 239.457803s
+Parallel medium threads=4 run 4: 219.88448s
+Parallel medium threads=4 run 5: 230.873033s
+Parallel medium threads=6 run 1: 185.019224s
+Parallel medium threads=6 run 2: 187.797575s
+Parallel medium threads=6 run 3: 179.054106s
+Parallel medium threads=6 run 4: 179.351344s
+Parallel medium threads=6 run 5: 176.554424s
+Parallel medium threads=8 run 1: 141.949056s
+Parallel medium threads=8 run 2: 153.078708s
+Parallel medium threads=8 run 3: 159.207125s
+Parallel medium threads=8 run 4: 153.089907s
+Parallel medium threads=8 run 5: 150.290108s
+Parallel medium threads=12 run 1: 153.767583s
+Parallel medium threads=12 run 2: 127.849095s
+Parallel medium threads=12 run 3: 119.704852s
+Parallel medium threads=12 run 4: 125.955357s
+Parallel medium threads=12 run 5: 124.356899s
+Parallel large threads=2 run 1: 790.742343s
+Parallel large threads=2 run 2: 781.141919s
+Parallel large threads=2 run 3: 788.018032s
+Parallel large threads=2 run 4: 766.117435s
+Parallel large threads=2 run 5: 774.995022s
+Parallel large threads=4 run 1: 432.423412s
+Parallel large threads=4 run 2: 441.416729s
+Parallel large threads=4 run 3: 436.107486s
+Parallel large threads=4 run 4: 434.412378s
+Parallel large threads=4 run 5: 435.60553s
+Parallel large threads=6 run 1: 312.455762s
+Parallel large threads=6 run 2: 325.066373s
+Parallel large threads=6 run 3: 310.944362s
+Parallel large threads=6 run 4: 311.945626s
+Parallel large threads=6 run 5: 312.086374s
+Parallel large threads=8 run 1: 258.044373s
+Parallel large threads=8 run 2: 264.449098s
+Parallel large threads=8 run 3: 262.644101s
+Parallel large threads=8 run 4: 255.978537s
+Parallel large threads=8 run 5: 255.813738s
+Parallel large threads=12 run 1: 203.767143s
+Parallel large threads=12 run 2: 198.605079s
+Parallel large threads=12 run 3: 204.396508s
+Parallel large threads=12 run 4: 199.590132s
+Parallel large threads=12 run 5: 205.914588s
+
+Running BSP benchmarks...
+BSP small threads=2 run 1: 101.38512s
+BSP small threads=2 run 2: 120.401667s
+BSP small threads=2 run 3: 120.437667s
+BSP small threads=2 run 4: 106.596593s
+BSP small threads=2 run 5: 114.947895s
+BSP small threads=4 run 1: 67.869274s
+BSP small threads=4 run 2: 101.062733s
+BSP small threads=4 run 3: 67.529347s
+BSP small threads=4 run 4: 83.643175s
+BSP small threads=4 run 5: 75.140294s
+BSP small threads=6 run 1: 63.715204s
+BSP small threads=6 run 2: 71.938516s
+BSP small threads=6 run 3: 60.066789s
+BSP small threads=6 run 4: 68.220622s
+BSP small threads=6 run 5: 60.688796s
+BSP small threads=8 run 1: 54.400329s
+BSP small threads=8 run 2: 53.753703s
+BSP small threads=8 run 3: 55.62539s
+BSP small threads=8 run 4: 59.238266s
+BSP small threads=8 run 5: 57.888565s
+BSP small threads=12 run 1: 45.382052s
+BSP small threads=12 run 2: 43.000269s
+BSP small threads=12 run 3: 44.814326s
+BSP small threads=12 run 4: 44.102421s
+BSP small threads=12 run 5: 49.008836s
+BSP medium threads=2 run 1: 418.42943s
+BSP medium threads=2 run 2: 426.045077s
+BSP medium threads=2 run 3: 431.15074s
+BSP medium threads=2 run 4: 426.162945s
+BSP medium threads=2 run 5: 434.643497s
+BSP medium threads=4 run 1: 255.891748s
+BSP medium threads=4 run 2: 247.916283s
+BSP medium threads=4 run 3: 246.747232s
+BSP medium threads=4 run 4: 284.288079s
+BSP medium threads=4 run 5: 220.970823s
+BSP medium threads=6 run 1: 192.856209s
+BSP medium threads=6 run 2: 181.123931s
+BSP medium threads=6 run 3: 203.062048s
+BSP medium threads=6 run 4: 198.018303s
+BSP medium threads=6 run 5: 187.797525s
+BSP medium threads=8 run 1: 154.683957s
+BSP medium threads=8 run 2: 160.509446s
+BSP medium threads=8 run 3: 155.915698s
+BSP medium threads=8 run 4: 166.009458s
+BSP medium threads=8 run 5: 154.733106s
+BSP medium threads=12 run 1: 127.916904s
+BSP medium threads=12 run 2: 131.537129s
+BSP medium threads=12 run 3: 128.678809s
+BSP medium threads=12 run 4: 133.491015s
+BSP medium threads=12 run 5: 134.546608s
+BSP large threads=2 run 1: 810.611254s
+BSP large threads=2 run 2: 807.865843s
+BSP large threads=2 run 3: 799.429192s
+BSP large threads=2 run 4: 814.410577s
+BSP large threads=2 run 5: 814.228779s
+BSP large threads=4 run 1: 446.555143s
+BSP large threads=4 run 2: 451.30968s
+BSP large threads=4 run 3: 456.230455s
+BSP large threads=4 run 4: 461.853076s
+BSP large threads=4 run 5: 480.575905s
+BSP large threads=6 run 1: 324.945224s
+BSP large threads=6 run 2: 324.738866s
+BSP large threads=6 run 3: 316.480644s
+BSP large threads=6 run 4: 323.438845s
+BSP large threads=6 run 5: 325.934907s
+BSP large threads=8 run 1: 310.481766s
+BSP large threads=8 run 2: 254.586768s
+BSP large threads=8 run 3: 285.423851s
+BSP large threads=8 run 4: 276.550364s
+BSP large threads=8 run 5: 288.234862s
+BSP large threads=12 run 1: 213.921102s
+BSP large threads=12 run 2: 216.299685s
+BSP large threads=12 run 3: 222.363493s
+BSP large threads=12 run 4: 198.850767s
+BSP large threads=12 run 5: 234.910096s
+
+Running work-stealing benchmarks...
+Work-stealing small threads=2 run 1: 102.528942s
+Work-stealing small threads=2 run 2: 114.046732s
+Work-stealing small threads=2 run 3: 106.693573s
+Work-stealing small threads=2 run 4: 96.112777s
+Work-stealing small threads=2 run 5: 97.553047s
+Work-stealing small threads=4 run 1: 58.967798s
+Work-stealing small threads=4 run 2: 54.495548s
+Work-stealing small threads=4 run 3: 69.276585s
+Work-stealing small threads=4 run 4: 64.800626s
+Work-stealing small threads=4 run 5: 58.47737s
+Work-stealing small threads=6 run 1: 44.349949s
+Work-stealing small threads=6 run 2: 48.836158s
+Work-stealing small threads=6 run 3: 55.495231s
+Work-stealing small threads=6 run 4: 51.095022s
+Work-stealing small threads=6 run 5: 55.396472s
+Work-stealing small threads=8 run 1: 46.329466s
+Work-stealing small threads=8 run 2: 50.226348s
+Work-stealing small threads=8 run 3: 47.701316s
+Work-stealing small threads=8 run 4: 42.125046s
+Work-stealing small threads=8 run 5: 45.126404s
+Work-stealing small threads=12 run 1: 105.948858s
+Work-stealing small threads=12 run 2: 31.114402s
+Work-stealing small threads=12 run 3: 36.104217s
+Work-stealing small threads=12 run 4: 33.403066s
+Work-stealing small threads=12 run 5: 35.874658s
+Work-stealing medium threads=2 run 1: 431.416519s
+Work-stealing medium threads=2 run 2: 414.794985s
+Work-stealing medium threads=2 run 3: 404.096661s
+Work-stealing medium threads=2 run 4: 402.370273s
+Work-stealing medium threads=2 run 5: 413.812483s
+Work-stealing medium threads=4 run 1: 244.29858s
+Work-stealing medium threads=4 run 2: 244.420919s
+Work-stealing medium threads=4 run 3: 217.612766s
+Work-stealing medium threads=4 run 4: 229.223015s
+Work-stealing medium threads=4 run 5: 228.346221s
+Work-stealing medium threads=6 run 1: 177.573377s
+Work-stealing medium threads=6 run 2: 180.269927s
+Work-stealing medium threads=6 run 3: 183.381846s
+Work-stealing medium threads=6 run 4: 169.828791s
+Work-stealing medium threads=6 run 5: 172.328633s
+Work-stealing medium threads=8 run 1: 147.246839s
+Work-stealing medium threads=8 run 2: 157.634166s
+Work-stealing medium threads=8 run 3: 151.000143s
+Work-stealing medium threads=8 run 4: 146.700053s
+Work-stealing medium threads=8 run 5: 138.918777s
+Work-stealing medium threads=12 run 1: 129.86973s
+Work-stealing medium threads=12 run 2: 116.028438s
+Work-stealing medium threads=12 run 3: 113.771124s
+Work-stealing medium threads=12 run 4: 110.120099s
+Work-stealing medium threads=12 run 5: 109.739862s
+Work-stealing large threads=2 run 1: 771.259219s
+Work-stealing large threads=2 run 2: 781.285119s
+Work-stealing large threads=2 run 3: 797.640395s
+Work-stealing large threads=2 run 4: 801.338219s
+Work-stealing large threads=2 run 5: 784.764226s
+Work-stealing large threads=4 run 1: 417.652896s
+Work-stealing large threads=4 run 2: 431.23871s
+Work-stealing large threads=4 run 3: 441.995155s
+Work-stealing large threads=4 run 4: 445.6018s
+Work-stealing large threads=4 run 5: 453.134607s
+Work-stealing large threads=6 run 1: 328.50015s
+Work-stealing large threads=6 run 2: 306.811252s
+Work-stealing large threads=6 run 3: 308.659409s
+Work-stealing large threads=6 run 4: 333.453896s
+Work-stealing large threads=6 run 5: 328.323461s
+Work-stealing large threads=8 run 1: 257.137539s
+Work-stealing large threads=8 run 2: 252.353603s
+Work-stealing large threads=8 run 3: 259.95497s
+Work-stealing large threads=8 run 4: 256.503154s
+Work-stealing large threads=8 run 5: 265.528711s
+Work-stealing large threads=12 run 1: 204.647957s
+Work-stealing large threads=12 run 2: 197.003921s
+Work-stealing large threads=12 run 3: 220.997312s
+Work-stealing large threads=12 run 4: 210.502876s
+Work-stealing large threads=12 run 5: 192.209744s
+
+==============================================
+Benchmarks complete! Results saved to benchmark_results.csv
+==============================================
+
+Generating speedup graphs...
+Reading benchmark results...
+Calculating speedups...
+
+================================================================================
+BENCHMARK RESULTS SUMMARY
+================================================================================
+
+SMALL Dataset:
+------------------------------------------------------------
+  Sequential: 166.9160s (avg of 5 runs)
+
+  PARALLEL:
+     2 threads: 107.3898s (speedup: 1.55x)
+     4 threads: 70.8567s (speedup: 2.36x)
+     6 threads: 63.5704s (speedup: 2.63x)
+     8 threads: 55.9275s (speedup: 2.98x)
+    12 threads: 45.0584s (speedup: 3.70x)
+
+  BSP:
+     2 threads: 112.7538s (speedup: 1.48x)
+     4 threads: 79.0490s (speedup: 2.11x)
+     6 threads: 64.9260s (speedup: 2.57x)
+     8 threads: 56.1813s (speedup: 2.97x)
+    12 threads: 45.2616s (speedup: 3.69x)
+
+  WORKSTEALING:
+     2 threads: 103.3870s (speedup: 1.61x)
+     4 threads: 61.2036s (speedup: 2.73x)
+     6 threads: 51.0346s (speedup: 3.27x)
+     8 threads: 46.3017s (speedup: 3.60x)
+    12 threads: 48.4890s (speedup: 3.44x)
+
+MEDIUM Dataset:
+------------------------------------------------------------
+  Sequential: 740.5795s (avg of 5 runs)
+
+  PARALLEL:
+     2 threads: 413.0944s (speedup: 1.79x)
+     4 threads: 229.5678s (speedup: 3.23x)
+     6 threads: 181.5553s (speedup: 4.08x)
+     8 threads: 151.5230s (speedup: 4.89x)
+    12 threads: 130.3268s (speedup: 5.68x)
+
+  BSP:
+     2 threads: 427.2863s (speedup: 1.73x)
+     4 threads: 251.1628s (speedup: 2.95x)
+     6 threads: 192.5716s (speedup: 3.85x)
+     8 threads: 158.3703s (speedup: 4.68x)
+    12 threads: 131.2341s (speedup: 5.64x)
+
+  WORKSTEALING:
+     2 threads: 413.2982s (speedup: 1.79x)
+     4 threads: 232.7803s (speedup: 3.18x)
+     6 threads: 176.6765s (speedup: 4.19x)
+     8 threads: 148.3000s (speedup: 4.99x)
+    12 threads: 115.9059s (speedup: 6.39x)
+
+LARGE Dataset:
+------------------------------------------------------------
+  Sequential: 1.4530s (avg of 5 runs)
+
+  PARALLEL:
+     2 threads: 780.2030s (speedup: 0.00x)
+     4 threads: 435.9931s (speedup: 0.00x)
+     6 threads: 314.4997s (speedup: 0.00x)
+     8 threads: 259.3860s (speedup: 0.01x)
+    12 threads: 202.4547s (speedup: 0.01x)
+
+  BSP:
+     2 threads: 809.3091s (speedup: 0.00x)
+     4 threads: 459.3049s (speedup: 0.00x)
+     6 threads: 323.1077s (speedup: 0.00x)
+     8 threads: 283.0555s (speedup: 0.01x)
+    12 threads: 217.2690s (speedup: 0.01x)
+
+  WORKSTEALING:
+     2 threads: 787.2574s (speedup: 0.00x)
+     4 threads: 437.9246s (speedup: 0.00x)
+     6 threads: 321.1496s (speedup: 0.00x)
+     8 threads: 258.2956s (speedup: 0.01x)
+    12 threads: 205.0724s (speedup: 0.01x)
+
+================================================================================
+
+Generating speedup graphs...
+Saved speedup_parallel.png and .pdf
+Saved speedup_bsp.png and .pdf
+Saved speedup_workstealing.png and .pdf
+Saved speedup_comparison.png and .pdf
+
+Done!
+Done.
