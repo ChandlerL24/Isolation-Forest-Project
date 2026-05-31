@@ -1,202 +1,173 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=23875336&assignment_repo_type=AssignmentRepo)
-# Project \#3: Your Choice!
+# Parallel Isolation Forest
 
-**See gradescope for due date**
+This is an anomaly detection system written in Go using the Isolation Forest algorithm. I wrote a plain sequential version first to get the algorithm right, then built three parallel versions on top of it (channels, BSP, and work-stealing) so I could compare how they scale.
 
-## Assignment
+If you want the full experiment write-up with the speedup graphs and cluster results, that's in [`proj3/REPORT.md`](proj3/REPORT.md). This file is just about how the thing works and how to run it.
 
-The final project gives you the opportunity to show me what you learned
-in this course and to build your own parallel system. In particular, you
-should think about implementing a parallel system in the domain you are
-most comfortable in (data science, machine learning, computer graphics,
-etc.). The system should solve a problem that can benefit from some form
-of parallelization and can be implemented in the way specified below.
-I recommend reading the entire description before deciding what to implement.
-If you are having trouble coming up with a problem for your system to
-solve then consider the following:
+## The basic idea
 
--   [Embarrassingly Parallel
-    Topics](https://en.wikipedia.org/wiki/Embarrassingly_parallel)
--   [Parallel
-    Algorithms](https://en.wikipedia.org/wiki/Parallel_computing#Algorithmic_methods)
+The goal is to find the data points that don't fit in with everything else. Isolation Forest does this with a pretty neat trick: anomalies are rare and they look different, so they're easy to "isolate." If you keep chopping the data up with random splits, an oddball point gets cut off from the rest after only a few cuts, while a normal point buried in the crowd takes a lot more.
 
-You are free to implement any parallel algorithm you like. However, you
-are required to at least have the following features in your parallel
-system:
+So the algorithm basically measures how fast each point gets isolated:
 
--   An input/output component that allows the program to read in data or
-    receive data in some way. The system will perform some
-    computation(s) on this input and produce an output result.
+1. Build a bunch of random trees, each on a small random sample of the data.
+2. At each node, pick a random feature and a random split value, then split the points.
+3. Count how many splits it takes to isolate a point (that's its path length).
+4. Average that path length over all the trees. Short average = anomaly.
+5. Turn the average into a score between 0 and 1, where higher means more suspicious.
 
--   A sequential implementation of the system. Make sure to provide a
-    usage statement.
+The reason this is worth parallelizing is that the trees don't depend on each other at all. You can build all 100 of them at the same time and nobody needs to talk to anybody.
 
--   Basic Parallel Implementation: An implementation that uses the BSP
-    pattern (using a condition variable to implement the barrier between
-    supersteps), **or** a pipelining pattern (using channels) **or** a
-    map-reduce implementation (again using a condition variable as barrier
-    between the map and the reduce stage). Choose whichever is most suitable
-    for solving the problem you have decided to tackle. The work in each
-    stage or superstep should be divided among threads in a simple fashion.
-    For example, if you choose an image processing problem with N images,
-    then each of your T threads might be assigned to work on approximately
-    N/T images. The easiest and most reasonable way to divide the work will
-    depend on your problem and your chosen parallelization approach.
+## How the code is laid out
 
--   Work-stealing refinement: A work-stealing algorithm using a **dequeue**
-    should be used such that the work can be split into smaller tasks, which
-    are placed in a work queue such that threads will steal work from other threads
-    when idle. You have some freedom in how exactly you want to implement the dequeue;
-    it could either be based on an array as shown in class, where the owner pops items
-    from one end whereas thieves pop items from the other end, or it could be
-    implemented as a conventional dequeue where one end is used for enqueing, and the
-    other end is only used for dequeueing, similar to the CIVL implementation. You can
-    also choose other implementations as long as you justify why they make sense in your
-    report. The one major requirement is that **your data structure is lock-free**.
+Everything is under `proj3/` (that's where the `go.mod` lives).
 
--   Provide a detailed write-up and analysis of your system. For this
-    assignment, this write-up is required to have more detail to explain
-    your parallel implementations since we are not giving you a problem
-    to solve. See the **System Write-up** section for more details.
+```
+proj3/
+├── main.go                 # CLI, picks a mode, runs it, prints/saves results
+├── go.mod
+│
+├── data/
+│   └── data.go             # reads CSVs into Points and a Dataset
+│
+├── iforest/
+│   ├── tree.go             # the tree itself: building, path length, scoring
+│   ├── sequential.go       # the plain single-threaded version
+│   ├── parallel.go         # channel-based version + BSP version
+│   └── workstealing.go     # the work-stealing version
+│
+├── workstealing/
+│   ├── deque.go            # lock-free deque (the CAS stuff)
+│   └── scheduler.go        # the worker pool + stealing logic
+│
+├── scripts/generate_data.go  # makes fake datasets to test with
+├── datasets/                 # some pre-made datasets (small/medium/large)
+├── benchmark/                # benchmark scripts, the SLURM job, the graphs
+├── run_benchmark.sh          # runs the whole benchmark in one go
+└── REPORT.md                 # the detailed write-up
+```
 
--   Provide all the dataset files you used in your analysis portion of
-    your write up. If these files are too big then you need to provide us
-    a link so we can easily download them from an external source.
-    It is likely that the work-stealing refinement is only beneficial if your
-    input data is structured in a certain way, e.g. if items in the input are of vastly
-    different sizes, or if subtasks in your algorithm have varying or unpredictable costs.
-    Make sure that this is the case for your project, so that you can showcase the pros/cons of all implementations.
+I split it into three packages on purpose. The `data` package only knows about CSVs and points, it has no clue what a forest is. The `iforest` package is the algorithm and the four ways of running it. And `workstealing` is a generic scheduler that doesn't know anything about isolation forests at all — you just hand it a function and it runs your tasks. The forest just plugs its tree-building into it, but you could reuse it for something else.
 
--   The grade also include design points. You should think about the
-    modularity of the system you are creating. Think about splitting
-    your code into appropriate packages, when necessary.
+## Walking through what happens
 
--   **You must provide a script or specific commands that shows/produces
-    the results of your system**. We need to be able to enter in a
-    single command in the terminal window and it will run and produce
-    the results of your system. Failing to provide a straight-forward
-    way of executing your system that produces its result will result in
-    **significant deductions** to your score. We prefer running a simple
-    command line script (e.g., shell-script or python3 script). However,
-    providing a few example cases of possible execution runs will be
-    acceptable.
+**Loading the data.** `LoadCSV` in `data/data.go` reads the file and turns each row into a `Point`:
 
--   We should also be able to run specific versions of the system. There
-    should be an option (e.g. via command line argument) to run the
-    sequential version, or the various parallel versions. Please make
-    sure to document this in your report or via the printing of a usage
-    statement.
+```go
+type Point struct {
+    Features []float64 // the numbers we actually use
+    Label    string    // optional, only used to check accuracy
+    ID       int        // which row it came from
+}
+```
 
--   You are free to use any additional standard/third-party libraries as
-    you wish. However, all the parallel work is **required** to be
-    implemented by you.
+You tell it which columns are features with `-features 0,1,2,...`, which column has the label (if any) with `-label`, and whether there's a header row to skip. Anything with missing or non-numeric values just gets skipped.
 
--   There is a directory called `proj3` with a single `go.mod` file
-    inside your repositories. Place all your work for project 3 inside
-    this directory.
+**Setting up the forest.** `NewIsolationForest` figures out two values from the original paper. The max depth is `ceil(log2(sampleSize))` — there's no point growing trees deeper than that. And `C` is the average path length you'd expect in a random binary tree, which is used to normalize the scores so they're comparable.
 
-### System Write-up
+**Building a tree.** `BuildTree` recurses down: grab a random feature, find its min and max in the current points, pick a random split somewhere in between, send the points left or right, repeat. It stops and makes a leaf when it hits max depth, gets down to one point, or all the points are identical. (There's also a small guard for features that don't vary — it'll rotate to another feature if the one it picked is constant.)
 
-In prior assignments, we provided you with the input files or data to
-run experiments against a your system and provide an analysis of those
-experiments. For this project, you will do the same with the exception
-that you will produce the data needed for your experiments. In all, you
-should do the following for the writeup:
+The important thing: this part is identical across all four modes. The *only* difference between sequential, parallel, BSP, and work-stealing is how the work of building all the trees gets handed out to threads.
 
--   Run experiments with data you generate for both the sequential and
-    parallel versions. For
-    the parallel version, make sure you are running your experiments
-    with at least producing work for `N` threads, where
-    `N = {2,4,6,8,12}`. 
-    
-    **Cluster Requirement**: Please run your final experiments on the cluster node (`fe.ai.cs.uchicago.edu` `peanut-cpu` partition). You can find detail instruction on Canvas.
--   Produce speedup graph(s) for those data sets. You should have one
-    speedup graph per parallel implementation you define in your system.
+**Scoring.** Once the trees are built, every point gets walked down every tree to find its path length. Average those, then:
 
-Please submit a report (pdf document, text file, etc.) summarizing your
-results from the experiments and the conclusions you draw from them.
-Your report should include your plot(s) as specified above and a
-self-contained report. That is, somebody should be able to read the
-report alone and understand what code you developed, what experiments
-you ran and how the data supports the conclusions you draw. The report
-**must** also include the following:
+```
+score = 2 ^ ( -avgPathLength / C )
+```
 
--   Describe your program and the problem it is trying to solve in detail.
--   A description of how you implemented your parallel solutions, and why
-    the approach you picked (BSP, map-reduce, pipelining) is the most appropriate. You probably
-    want to discuss things like load balancing, latency/throughput, etc.
--   Describe the challenges you faced while implementing the system.
-    What aspects of the system might make it difficult to parallelize?
-    In other words, what did you hope to learn by doing this assignment?
--   Did the usage of a task queue with work stealing improve performance?
-    Why or why not?
--   What are the **hotspots** (i.e., places where you can parallelize
-    the algorithm) and **bottlenecks** (i.e., places where there is
-    sequential code that cannot be parallelized) in your sequential
-    program? Were you able to parallelize the hotspots and/or remove the
-    bottlenecks in the parallel version?
--   What limited your speedup? Is it a lack of parallelism?
-    (dependencies) Communication or synchronization overhead? As you try
-    and answer these questions, we strongly prefer that you provide data
-    and measurements to support your conclusions.
--   Compare and contrast the two parallel implementations. Are there
-    differences in their speedups?
+Short path → exponent near zero → score near 1 → probably an anomaly.
 
-## Don't know What to Implement?
+**Output.** It prints the top N anomalies, dumps everything to a CSV sorted by score, and if you gave it labels it'll also print precision and recall on the top N.
 
-If you are unsure what to implement then by default you can reimplement
-the image processing assignment using the required new features.
+## The four modes
 
-**You cannot reimplement project 2 or other assignments**.
+You pick one with `-mode`. They all give you the same kind of answer — they just schedule the work differently.
 
-## Design, Style and Cleaning up
+**Sequential** (`sequential.go`) is the baseline. One tree at a time in a for loop, then score the points one at a time. Everything else gets compared against this.
 
-Before you submit your final solution, you should, remove
+**Parallel** (`parallel.go`) is the normal Go way of doing it. There's a task channel with one tree per task, a handful of worker goroutines pull from it, build their tree, and send it back on a result channel. Channels handle all the locking for you, and load balancing just happens naturally since a worker grabs the next task the moment it's free. Scoring works the same way but in batches.
 
--   any `Printf` statements that you added for debugging purposes and
--   all in-line comments of the form: "YOUR CODE HERE" and "TODO ..."
--   Think about your function decomposition. No code duplication. This
-    homework assignment is relatively small so this shouldn't be a major
-    problem but could be in certain problems.
+**BSP** (also in `parallel.go`) does it in supersteps. Each superstep handles `numWorkers` trees, and there's a barrier (built with a `sync.Cond`) where everyone waits for each other before and after. Honestly this is overkill for this problem — the trees don't depend on each other so the barriers are just wasted waiting — but it's there to show the pattern, and it makes a nice point about when barriers actually cost you.
 
-Go does not have a strict style guide. However, use your best judgment
-from prior programming experience about style. Did you use good variable
-names? Do you have any lines that are too long, etc.
+**Work-stealing** (`workstealing.go` plus the `workstealing` package) is the interesting one. Every worker has its own deque. It pushes and pops its own work from the bottom, and when it runs dry it steals from the top of some random other worker's deque. Owner works one end, thieves work the other, so they rarely collide. The deque is lock-free — it uses atomic compare-and-swap loops instead of mutexes.
 
-As you clean up, you should periodically save your file and run your
-code through the tests to make sure that you have not broken it in the
-process.
+To actually show stealing doing something, I hand the first worker half of all the tasks on purpose. Without stealing it would be stuck grinding while everyone else sat around. With stealing, the idle workers come grab its work and even things out. If you run it with `-verbose` you can see exactly how many tasks each worker did and how many it stole.
 
-## Grading
+The scheduler itself (`scheduler.go`) is straightforward: each worker loops doing its own work, tries to steal when empty, and once every deque is empty it flips a done flag and everyone quits. There's a tiny exponential backoff so idle workers don't spin the CPU while they wait.
 
-For this project, we grade as follows:
- - 50% Completeness. Your code should implement the required features without deadlocks or race conditions.
- - 20% Performance. Does your code scale, did you avoid unnecessary data copies, did you make an effort to remove obvious performance bottlenecks.
- - 20% Writeup. Is the report detailed, reasonably well written, and contains all the parts we asked for.
- - 10% Design and Style.
+## Running it
 
-## Submission
+Build it:
 
-Before submitting, make sure you've added, committed, and pushed all
-your code to GitHub. You must submit your final work through Gradescope
-(linked from our Canvas site) in the "Project \#3" assignment page via
-two ways,
+```bash
+cd proj3
+go build -o iforest_detector .
+```
 
-1.  **Uploading from Github directly (recommended way)**: You can link
-    your Github account to your Gradescope account and upload the
-    correct repository based on the homework assignment. When you submit
-    your homework, a pop window will appear. Click on "Github" and then
-    "Connect to Github" to connect your Github account to Gradescope.
-    Once you connect (you will only need to do this once), then you can
-    select the repsotiory you wish to upload and the branch (which
-    should always be "main" or "master") for this course.
-2.  **Uploading via a Zip file**: You can also upload a zip file of the
-    homework directory. Please make sure you upload the entire directory
-    and keep the initial structure the **same** as the starter code;
-    otherwise, you run the risk of not passing the automated tests.
+Run one mode:
 
-As a reminder, for this assignment, there will be **no autograder** on
-Gradescope. We will run the program the CS Peanut cluster and manually
-enter in the grading into Gradescope. However, you **must still submit
-your final commit to Gradescope**.
+```bash
+# sequential
+./iforest_detector -input datasets/small_gaussian.csv -features 0,1,2,3,4,5,6,7,8,9 -mode sequential
 
+# parallel, 8 workers
+./iforest_detector -input datasets/small_gaussian.csv -features 0,1,2,3,4,5,6,7,8,9 -mode parallel -workers 8
+
+# bsp
+./iforest_detector -input datasets/small_gaussian.csv -features 0,1,2,3,4,5,6,7,8,9 -mode bsp -workers 8
+
+# work-stealing (add -verbose to see the steal counts)
+./iforest_detector -input datasets/small_gaussian.csv -features 0,1,2,3,4,5,6,7,8,9 -mode workstealing -workers 8 -verbose
+```
+
+Compare all of them at once:
+
+```bash
+./iforest_detector -input datasets/small_gaussian.csv -features 0,1,2,3,4,5,6,7,8,9 -benchmark -workers 12
+```
+
+Or just run the whole benchmark, which builds everything, makes fresh datasets, and runs every mode:
+
+```bash
+cd proj3
+./run_benchmark.sh
+```
+
+Tests:
+
+```bash
+cd proj3
+go test ./...
+```
+
+## The flags
+
+| Flag | Default | What it does |
+|------|---------|--------------|
+| `-input` | required | the input CSV |
+| `-features` | required | which columns are features (e.g. `0,1,2`) |
+| `-mode` | sequential | `sequential`, `parallel`, `bsp`, or `workstealing` |
+| `-workers` | 4 | number of worker goroutines |
+| `-trees` | 100 | how many trees in the forest |
+| `-sample` | 256 | sample size per tree |
+| `-label` | -1 | column with labels, or -1 if there aren't any |
+| `-top` | 10 | how many top anomalies to print |
+| `-seed` | 42 | random seed so runs are repeatable |
+| `-output` | results.csv | where to write the scored output |
+| `-header` | true | skip the first row of the CSV |
+| `-benchmark` | false | run every mode and compare |
+| `-verbose` | false | print extra timing and steal stats |
+
+## Reading the scores
+
+Each point ends up with a score between 0 and 1:
+
+- above ~0.6: probably an anomaly
+- 0.5 to 0.6: borderline, could go either way
+- below 0.5: probably fine
+
+Higher score means the point got isolated faster, which means it's more of an outlier.
+
+## More detail
+
+[`proj3/REPORT.md`](proj3/REPORT.md) has the real write-up — the design reasoning, the speedup graphs, the bottleneck analysis, and the results from running it on the UChicago cluster. The graphs themselves are in `proj3/benchmark/`.
